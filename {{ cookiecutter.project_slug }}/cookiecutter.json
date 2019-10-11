@@ -1,0 +1,13 @@
+{
+  "project_name": "My Awesome Web Design",
+  "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
+  "description": "Behold My Awesome Design!",
+  "author": "Anand Magaji",
+  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@example.com",
+  "version": "0.1.0",
+  "css_framework": [
+    "Foundation",
+    "Bootstrap",
+    "Semantic UI"
+  ]
+}
