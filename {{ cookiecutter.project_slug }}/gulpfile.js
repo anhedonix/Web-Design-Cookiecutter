@@ -31,12 +31,12 @@ function pathsConfig(appName) {
     return {
 
         app: this.app,
-        templates: `html`,
-        css: `css`,
-        sass: `sass`,
-        fonts: `fonts`,
-        media: `media`,
-        js: `js`,
+        templates: `root`,
+        css: `root/css`,
+        sass: `root/sass`,
+        fonts: `root/fonts`,
+        media: `root/media`,
+        js: `root/js`,
     };
 }
 
@@ -106,7 +106,7 @@ function initBrowserSync() {
             `${paths.templates}/**/*.html`
         ], {
             // https://www.browsersync.io/docs/options/#option-proxy
-            server: 'html',
+            server: 'root',
             browser: "Google Chrome"
         }
     )
