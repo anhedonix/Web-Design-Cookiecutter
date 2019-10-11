@@ -25,18 +25,18 @@ const waitOn = require('wait-on');
 
 // Relative paths function
 function pathsConfig(appName) {
-    this.app = `./source`;
+    this.app = `./`;
     const vendorsRoot = 'node_modules';
 
     return {
 
         app: this.app,
-        templates: `${this.app}/templates`,
-        css: `${this.app}/static/css`,
-        sass: `${this.app}/static/sass`,
-        fonts: `${this.app}/static/fonts`,
-        images: `${this.app}/static/images`,
-        js: `${this.app}/static/js`,
+        templates: `html`,
+        css: `css`,
+        sass: `sass`,
+        fonts: `fonts`,
+        media: `media`,
+        js: `js`,
     };
 }
 
@@ -57,7 +57,7 @@ function styles() {
         cssnano({preset: 'default'})   // minify result
     ];
 
-    return src(`${paths.sass}/project.sass`)
+    return src(`${paths.sass}/**/*.sass`)
         .pipe(sass({
             includePaths: [
                 paths.sass
@@ -65,7 +65,7 @@ function styles() {
         }).on('error', sass.logError))
         .pipe(plumber()) // Checks for errors
         .pipe(postcss(processCss))
-        // .pipe(dest(paths.css))
+        .pipe(dest(paths.css))
         .pipe(rename({suffix: '.min'}))
         .pipe(postcss(minifyCss)) // Minifies the result
         .pipe(dest(paths.css))
@@ -73,7 +73,7 @@ function styles() {
 
 // Javascript minification
 function scripts() {
-    return src(`${paths.js}/project.js`)
+    return src(`${paths.js}/**/*.js`)
         .pipe(plumber()) // Checks for errors
         .pipe(uglify()) // Minifies the js
         .pipe(rename({suffix: '.min'}))
@@ -83,72 +83,40 @@ function scripts() {
 
 // Image compression
 function imgCompression() {
-    return src(`${paths.images}/*`)
+    return src(`${paths.media}/*`)
         .pipe(imagemin()) // Compresses PNG, JPEG, GIF and SVG images
-        .pipe(dest(paths.images))
+        .pipe(dest(paths.media))
 }
 
 // Run django server
 function runServer(cb) {
     // let post = spawn('startpost', {stdio: 'inherit'});
-    let cmd = spawn('pipenv', ['run', 'python', 'manage.py', 'runserver_plus', '0.0.0.0:8000'], {stdio: 'inherit'});
-    console.log('\n\n' +
-        '  ____            _     _ _               \n' +
-        ' / ___|  __ _  __| | __| | | ___  ___     \n' +
-        ' \\___ \\ / _` |/ _` |/ _` | |/ _ \\/ __|    \n' +
-        '  ___) | (_| | (_| | (_| | |  __/\\__ \\    \n' +
-        ' |____/ \\__,_|\\__,_|\\__,_|_|\\___||___/    \n' +
-        ' |  _ \\  ___  ___(_) __ _ _ __   ___ _ __ \n' +
-        ' | | | |/ _ \\/ __| |/ _` | \'_ \\ / _ \\ \'__|\n' +
-        ' | |_| |  __/\\__ \\ | (_| | | | |  __/ |   \n' +
-        ' |____/ \\___||___/_|\\__, |_| |_|\\___|_|   \n' +
-        '                    |___/                 \n' +
-        '\n');
-    console.log("Developer:\tAnand Magaji, Rahul Uddhi");
-    console.log("Documentation:\thttps://saddlesindia.github.io/Designer/");
-    console.log("Website:\thttps://saddlesindia.studio\n");
-    cmd.on('close', function (code) {
-        console.log('runServer exited with code ' + code);
-        cb(code)
-    });
+    console.log("Developer:\t{{ cookiecutter.author }}");
+    console.log("Website:\t{{ cookiecutter.website }}");
 }
 
 
 // Browser sync server for live reload
 function initBrowserSync() {
-    waitOn(
-        {
-            resources: [
-                'http-get://0.0.0.0:8000/'
-            ],
-            // delay: 1000, // initial delay in ms, default 0
-            interval: 1000, // poll interval in ms, default 250ms
-            timeout: 500, // timeout in ms, default Infinity
-            tcpTimeout: 1000, // tcp timeout in ms, default 300ms
-            // window: 1000, // stabilization time in ms, default 750ms
-        }, function (err) {
-            if (err) {
-            } else {
-                browserSync.init(
-                    [
-                        `${paths.css}/*.css`,
-                        `${paths.js}/*.js`,
-                        `${paths.templates}/*.html`
-                    ], {
-                        // https://www.browsersync.io/docs/options/#option-proxy
-                        proxy: '0.0.0.0:8000',
-                        browser: "Google Chrome"
-                    }
-                )
-            }
-        });
+    browserSync.init(
+        [
+            `${paths.css}/**/*.css`,
+            `${paths.js}/**/*.js`,
+            `${paths.templates}/**/*.html`
+        ], {
+            // https://www.browsersync.io/docs/options/#option-proxy
+            server: 'html',
+            browser: "Google Chrome"
+        }
+    )
+
 }
 
 // Watch
 function watchPaths() {
-    watch(`${paths.sass}/*.sass`, styles);
+    watch(`${paths.sass}/**/*.sass`, styles);
     watch(`${paths.templates}/**/*.html`).on("change", reload);
-    watch([`!${paths.js}/*.min.js`], scripts).on("change", reload)
+    watch([`!${paths.js}/**/*.min.js`], scripts).on("change", reload)
 }
 
 // Generate all assets
@@ -158,9 +126,6 @@ const generateAssets = parallel(
     imgCompression
 );
 
-function setDB() {
-   let cmd = spawn('createdb', ["studio", "-U", "postgres"], {stdio: 'inherit'});
-}
 
 // Set up dev environment
 const dev = parallel(
@@ -172,4 +137,3 @@ const dev = parallel(
 exports.default = series(generateAssets, dev);
 exports["generate"] = generateAssets;
 exports["dev"] = dev;
-exports.setUp = series(setDB);
