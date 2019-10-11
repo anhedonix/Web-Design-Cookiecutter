@@ -93,6 +93,7 @@ function runServer(cb) {
     // let post = spawn('startpost', {stdio: 'inherit'});
     console.log("Developer:\t{{ cookiecutter.author }}");
     console.log("Website:\t{{ cookiecutter.website }}");
+    initBrowserSync();
 }
 
 
@@ -130,7 +131,6 @@ const generateAssets = parallel(
 // Set up dev environment
 const dev = parallel(
     runServer,
-    initBrowserSync,
     watchPaths
 );
 
