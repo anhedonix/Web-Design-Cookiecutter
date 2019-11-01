@@ -49,6 +49,9 @@ var paths = pathsConfig();
 // Styles autoprefixing and minification
 function styles() {
     let processCss = [
+        {% if cookiecutter.framework === "TailWind" %}
+        require('tailwindcss'),
+        {% endif %}
         autoprefixer(), // adds vendor prefixes
         pixrem(),       // add fallback for rem units
     ];

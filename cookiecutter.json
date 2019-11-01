@@ -6,10 +6,5 @@
   "website": "amagaji.me",
   "email": "{{ cookiecutter.author.lower()|replace(' ', '-') }}@example.com",
   "version": "0.1.0",
-  "framework": [
-    "None",
-    "Foundation",
-    "Bootstrap",
-    "Semantic UI"
-  ]
+  "framework": ["None", "Foundation", "Bootstrap", "Semantic UI", "TailWind"]
 }
