@@ -50,6 +50,7 @@ var paths = pathsConfig();
 function styles() {
     let processCss = [
         {% if cookiecutter.framework == "TailWind" %}
+        require('postcss-import'),
         require('tailwindcss'),
         {% endif %}
         autoprefixer(), // adds vendor prefixes
