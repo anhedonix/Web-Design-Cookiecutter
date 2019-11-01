@@ -22,6 +22,7 @@ const spawn = require('child_process').spawn;
 const uglify = require('gulp-uglify-es').default;
 const request = require('request');
 const waitOn = require('wait-on');
+const concat = require('gulp-concat');
 
 // Relative paths function
 function pathsConfig(appName) {
@@ -50,8 +51,7 @@ var paths = pathsConfig();
 function styles() {
     let processCss = [
         {% if cookiecutter.framework == "TailWind" %}
-        require('postcss-import'),
-        require('tailwindcss'),
+        require('tailwindcss')('./tailwind.config.js'),
         {% endif %}
         autoprefixer(), // adds vendor prefixes
         pixrem(),       // add fallback for rem units
@@ -72,6 +72,8 @@ function styles() {
         .pipe(dest(paths.css))
         .pipe(rename({suffix: '.min'}))
         .pipe(postcss(minifyCss)) // Minifies the result
+        .pipe(dest(paths.css))
+        .pipe(concat('styles_all.min.css'))
         .pipe(dest(paths.css))
 }
 
@@ -120,6 +122,7 @@ function initBrowserSync() {
 // Watch
 function watchPaths() {
     watch(`${paths.sass}/**/*.sass`, styles);
+    watch(`./tailwind.config.js`, styles);
     watch(`${paths.templates}/**/*.html`).on("change", reload);
     watch([`!${paths.js}/**/*.min.js`], scripts).on("change", reload)
 }
